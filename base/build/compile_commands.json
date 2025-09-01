@@ -1,0 +1,14 @@
+[
+{
+  "directory": "/Users/shrehanrajsingh/Desktop/programming/simuce/base/build",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc   -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -o CMakeFiles/simuce-base.dir/simuce-base.c.o -c /Users/shrehanrajsingh/Desktop/programming/simuce/base/simuce-base.c",
+  "file": "/Users/shrehanrajsingh/Desktop/programming/simuce/base/simuce-base.c",
+  "output": "CMakeFiles/simuce-base.dir/simuce-base.c.o"
+},
+{
+  "directory": "/Users/shrehanrajsingh/Desktop/programming/simuce/base/build/tests",
+  "command": "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/cc  -I/Users/shrehanrajsingh/Desktop/programming/simuce/base/tests/.. -g -arch arm64 -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.5.sdk -o CMakeFiles/SIMUCE_BASE_TEST_EXE.dir/test.c.o -c /Users/shrehanrajsingh/Desktop/programming/simuce/base/tests/test.c",
+  "file": "/Users/shrehanrajsingh/Desktop/programming/simuce/base/tests/test.c",
+  "output": "tests/CMakeFiles/SIMUCE_BASE_TEST_EXE.dir/test.c.o"
+}
+]
