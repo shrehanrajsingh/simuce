@@ -1,8 +1,7 @@
 #if !defined(SIMUCE_BASE_H)
 #define SIMUCE_BASE_H
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include "fileio.h"
+#include "header.h"
 
 #endif // SIMUCE_BASE_H
