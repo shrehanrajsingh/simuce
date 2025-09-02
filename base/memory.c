@@ -1,6 +1,6 @@
 #include "memory.h"
 
-sce_mem_ctx *context = NULL;
+static sce_mem_ctx *context = NULL;
 
 #define ASSERT_CONTEXT_IS_SET(X)                                              \
   if ((X) == NULL && context == NULL)                                         \
@@ -33,6 +33,18 @@ SCE_mem_init (sce_mem_ctx *ctx)
 SCE_BASE_API void
 SCE_mem_destroy (void)
 {
+  if (context == NULL)
+    return;
+
+  sce_memnode_t *head = HEAD (context);
+
+  do
+    {
+      free (head->addr);
+      head = head->next;
+    }
+  while (head != NULL && head != HEAD (context));
+
   context = NULL;
 }
 
@@ -63,6 +75,8 @@ SCE_Malloc (sce_mem_ctx *ctx, size_t s)
       HEAD (ctx)->next = nt;
       nt->prev = HEAD (ctx);
     }
+
+  return nt->addr;
 }
 
 SCE_BASE_API void *
@@ -72,7 +86,7 @@ SCE_Realloc (sce_mem_ctx *ctx, void *old, size_t n)
   sce_memnode_t *mt = NULL;
   sce_memnode_t *hd = HEAD (ctx);
 
-  while (HEAD (ctx) != NULL && HEAD (ctx) != hd)
+  do
     {
       if (HEAD (ctx)->addr <= old && HEAD (ctx)->addr + HEAD (ctx)->size > old)
         {
@@ -82,6 +96,7 @@ SCE_Realloc (sce_mem_ctx *ctx, void *old, size_t n)
 
       HEAD (ctx) = HEAD (ctx)->next;
     }
+  while (HEAD (ctx) != NULL && HEAD (ctx) != hd);
 
   if (mt == NULL)
     {
@@ -96,7 +111,11 @@ SCE_Realloc (sce_mem_ctx *ctx, void *old, size_t n)
 
       if (newptr != mt->addr)
         mt->addr = newptr;
+
+      return newptr;
     }
+
+  return NULL;
 }
 
 SCE_BASE_API void
@@ -107,8 +126,9 @@ SCE_Free (sce_mem_ctx *ctx, void *ptr)
   sce_memnode_t *mt = NULL;
   sce_memnode_t *hd = HEAD (ctx);
 
-  while (HEAD (ctx) != NULL && HEAD (ctx) != hd)
+  do
     {
+      //   printf ("%p %p\n", ptr, HEAD (ctx)->addr);
       if (HEAD (ctx)->addr <= ptr && HEAD (ctx)->addr + HEAD (ctx)->size > ptr)
         {
           mt = HEAD (ctx);
@@ -117,6 +137,7 @@ SCE_Free (sce_mem_ctx *ctx, void *ptr)
 
       HEAD (ctx) = HEAD (ctx)->next;
     }
+  while (HEAD (ctx) != NULL && HEAD (ctx) != hd);
 
   if (mt == NULL)
     {

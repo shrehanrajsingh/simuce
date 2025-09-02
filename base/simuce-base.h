@@ -3,5 +3,6 @@
 
 #include "fileio.h"
 #include "header.h"
+#include "memory.h"
 
 #endif // SIMUCE_BASE_H
