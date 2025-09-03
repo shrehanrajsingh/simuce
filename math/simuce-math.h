@@ -5,4 +5,6 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "number_system.h"
+
 #endif // SIMUCE_MATH_H

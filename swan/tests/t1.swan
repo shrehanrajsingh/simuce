@@ -1,0 +1,15 @@
+LET A, (BIGINT) 2103382901203001302092029249
+LET B, (BIGINT) 2012932039203949332932101139
+
+LET C
+ADD C, A, B             ; C = A + B
+CALL PUT, A, B, C
+
+MUL C, A, B             ; C = A * B
+CALL PUT, A, B, C
+
+DIV C, A, B             ; C = A / B
+CALL PUT, A, B, C
+
+SUB C, A, B             ; C = A - B
+CALL PUT, A, B, C

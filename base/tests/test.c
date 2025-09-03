@@ -34,7 +34,7 @@ test2 ()
   SCE_FREE (p2);
   SCE_FREE (p3);
   SCE_FREE (p4);
-  SCE_FREE (p4);
+  // SCE_FREE (p4);
 }
 
 int
@@ -45,7 +45,7 @@ main (int argc, char const *argv[])
 
   SCE_mem_init (ctx);
 
-  // TEST (1);
+  TEST (1);
   TEST (2);
 
   SCE_mem_destroy ();

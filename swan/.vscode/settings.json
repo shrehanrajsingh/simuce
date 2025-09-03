@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "*.cgi": "perl",
+        "*.sf": "sf",
+        "swan.h": "c"
+    }
+}
