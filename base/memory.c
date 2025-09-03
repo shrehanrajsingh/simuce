@@ -37,6 +37,11 @@ SCE_mem_destroy (void)
     return;
 
   sce_memnode_t *head = HEAD (context);
+  if (head == NULL)
+    {
+      context = NULL;
+      return;
+    }
 
   do
     {
@@ -86,17 +91,25 @@ SCE_Realloc (sce_mem_ctx *ctx, void *old, size_t n)
   sce_memnode_t *mt = NULL;
   sce_memnode_t *hd = HEAD (ctx);
 
+  if (hd == NULL)
+    {
+      perror ("Error: pointer realloc'ed was not allocated. Did you call "
+              "SCE_Malloc (...)?");
+      exit (-1);
+    }
+
   do
     {
-      if (HEAD (ctx)->addr <= old && HEAD (ctx)->addr + HEAD (ctx)->size > old)
+      if ((char *)hd->addr <= (char *)old
+          && (char *)hd->addr + hd->size > (char *)old)
         {
-          mt = HEAD (ctx);
+          mt = hd;
           break;
         }
 
-      HEAD (ctx) = HEAD (ctx)->next;
+      hd = hd->next;
     }
-  while (HEAD (ctx) != NULL && HEAD (ctx) != hd);
+  while (hd != NULL && HEAD (ctx) != hd);
 
   if (mt == NULL)
     {
@@ -126,16 +139,24 @@ SCE_Free (sce_mem_ctx *ctx, void *ptr)
   sce_memnode_t *mt = NULL;
   sce_memnode_t *hd = HEAD (ctx);
 
+  if (hd == NULL)
+    {
+      perror ("Error: pointer to free was not allocated. Did you call "
+              "SCE_Malloc (...)?");
+      exit (-1);
+    }
+
+  // printf ("%p\n", ptr);
   do
     {
-      //   printf ("%p %p\n", ptr, HEAD (ctx)->addr);
-      if (HEAD (ctx)->addr <= ptr && HEAD (ctx)->addr + HEAD (ctx)->size > ptr)
+      // printf ("%p %p\n", ptr, HEAD (ctx)->addr);
+      if (hd->addr <= ptr && (char *)hd->addr + hd->size > (char *)ptr)
         {
-          mt = HEAD (ctx);
+          mt = hd;
           break;
         }
 
-      HEAD (ctx) = HEAD (ctx)->next;
+      hd = hd->next;
     }
   while (HEAD (ctx) != NULL && HEAD (ctx) != hd);
 
@@ -149,8 +170,25 @@ SCE_Free (sce_mem_ctx *ctx, void *ptr)
     {
       free (mt->addr);
 
-      if (mt->prev != NULL)
-        mt->prev->next = mt->next;
+      if (mt->next == mt && mt->prev == mt)
+        {
+          HEAD (ctx) = NULL;
+        }
+      else
+        {
+          mt->prev->next = mt->next;
+          mt->next->prev = mt->prev;
+
+          if (HEAD (ctx) == mt)
+            HEAD (ctx) = mt->next;
+        }
+
       free (mt);
     }
+}
+
+SCE_BASE_API sce_mem_ctx *
+_SCE_get_context ()
+{
+  return context;
 }

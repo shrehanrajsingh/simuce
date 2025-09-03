@@ -33,6 +33,8 @@ extern "C"
   SCE_BASE_API void *SCE_Realloc (sce_mem_ctx *, void *, size_t);
   SCE_BASE_API void SCE_Free (sce_mem_ctx *, void *);
 
+  SCE_BASE_API sce_mem_ctx *_SCE_get_context ();
+
 #if !defined(SCE_MALLOC)
 #define SCE_MALLOC(X) SCE_Malloc (NULL, (X))
 #endif // SCE_MALLOC
