@@ -7,13 +7,17 @@ main (int argc, char const *argv[])
   ctx->head = NULL;
 
   SCE_mem_init (ctx);
-  sce_int_t n = NUM2 ("99", 2);
-  sce_int_t m = NUM2 ("1", 2);
+  sce_int_t a = NUM2 ("89", 2);
+  sce_int_t b = NUM2 ("1", 2);
+  sce_int_t c
+      = NUM ("1028372910281922349198829294887162623490031882891984738");
+  sce_int_t d = NUM ("10109293829438783439844578459485948694864098");
 
-  printf ("%s\n", n.val);
-  printf ("%s\n", m.val);
-  printf ("%s\n", ADD (&n, &m).val);
+  NUM_PRINT (SUB (&a, &b));
+  NUM_PRINT (SUB (&b, &a));
+  NUM_PRINT (ADD (&c, &d));
+  NUM_PRINT (SUB (&c, &d));
+
   SCE_mem_destroy ();
-
   return printf ("Program Ended\n");
 }

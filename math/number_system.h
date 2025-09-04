@@ -30,6 +30,16 @@ extern "C"
 #define SCE_MATH_INT_DEFAULT_PREC 128
 #endif // SCE_MATH_INT_DEFAULT_PREC
 
+#if !defined(NUM_PRINT)
+#define NUM_PRINT(X)                                                          \
+  do                                                                          \
+    {                                                                         \
+      sce_int_t t = (X);                                                      \
+      printf ("%c%s\n", t.is_neg ? '-' : '+', t.val);                         \
+    }                                                                         \
+  while (0)
+#endif // NUM_PRINT
+
 #if !defined(NUM)
 #define NUM(X) _sce_math_int_new ((X), SCE_MATH_INT_DEFAULT_PREC)
 #endif // NUM
@@ -41,6 +51,10 @@ extern "C"
 #if !defined(ADD)
 #define ADD(X, Y) _sce_math_int_add ((X), (Y))
 #endif // ADD
+
+#if !defined(SUB)
+#define SUB(X, Y) _sce_math_int_sub ((X), (Y))
+#endif // SUB
 
 #if !defined(ISGR)
 #define ISGR(X, Y) _sce_math_int_isgreater ((X), (Y))

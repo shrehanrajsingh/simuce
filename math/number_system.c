@@ -101,38 +101,52 @@ SCE_MATH_API sce_int_t
 _sce_math_int_sub (sce_int_t *a, sce_int_t *b)
 {
   sce_int_t r;
+  int is_neg = 0;
 
-  /* fix precision */
+  if (ISGR (b, a))
+    {
+      is_neg = 1;
+      sce_int_t *t = b;
+      b = a;
+      a = t;
+    }
+
   if (a->prec < b->prec)
     _sce_math_int_reset_prec (a, b->prec);
   else
     _sce_math_int_reset_prec (b, a->prec);
 
-  int carry = 0;
   char *aa = a->val + a->prec - 1;
   char *bb = b->val + b->prec - 1;
 
   r = _sce_math_int_new ("0", a->prec);
   char *rr = r.val + r.prec - 1;
+  int carry = 0;
 
   while (aa != a->val)
     {
-      int v = (*aa-- - '0') + (*bb-- - '0') + carry;
-      carry = v / 10;
-      *rr-- = (char)(v % 10) + '0';
+      int va = *aa--;
+      int vb = *bb--;
+
+      if (va && carry)
+        va--;
+
+      if (va < vb)
+        {
+          va += 10;
+          carry = 1;
+        }
+      else
+        carry = 0;
+
+      *rr-- = (char)(va - vb) + '0';
     }
 
-  /* last bit */
-  int v = *aa + *bb - '0' - '0' + carry;
-  carry = v / 10;
-  *rr = (char)(v % 10) + '0';
+  int va = *aa;
+  int vb = *bb;
 
-  if (carry)
-    {
-      /* raise precision */
-      _sce_math_int_reset_prec (&r, r.prec + 1);
-      r.val[0] = carry + '0';
-    }
+  *rr = (char)(va - vb) + '0';
+  r.is_neg = is_neg;
 
   return r;
 }

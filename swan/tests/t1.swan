@@ -20,7 +20,7 @@ ROUTINE e_taylor (x)
     LET F, 1
     LET T, 1
 
-    REPEAT 100000
+    BEGIN REPEAT 100000
         ADD T, T, E / F         ; t += e / f
         MUL E, E, x             ; e = e * x
         MUL F, F, F + 1         ; f = f * (f + 1)
