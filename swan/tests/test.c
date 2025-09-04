@@ -13,6 +13,7 @@ main (int argc, char const *argv[])
   char *fdata = SCE_File_Readall (f);
 
   _sce_swan_setcode (fdata);
+  sce_swan_tokenize ();
 
   SCE_File_Destroy (f);
   SCE_mem_destroy ();

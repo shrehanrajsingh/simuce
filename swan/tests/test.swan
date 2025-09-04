@@ -1,1 +1,5 @@
 LET A, 20
+ADD A, A, 20
+
+BEGIN ROUTINE something
+END
