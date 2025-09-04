@@ -4,6 +4,7 @@ SCE_MATH_API sce_int_t
 _sce_math_int_new (const char *n, size_t p)
 {
   sce_int_t t;
+  t.is_neg = *n == '-';
   t.prec = p;
   t.val = SCE_MALLOC (t.prec + 1);
 
@@ -14,7 +15,7 @@ _sce_math_int_new (const char *n, size_t p)
   char *end = t.val + t.prec - 1;
   char *nend = (char *)n + nl - 1;
 
-  for (size_t i = 0; i < nl; i++)
+  for (size_t i = t.is_neg; i < nl; i++)
     *end-- = *nend--;
 
   return t;
@@ -22,6 +23,82 @@ _sce_math_int_new (const char *n, size_t p)
 
 SCE_MATH_API sce_int_t
 _sce_math_int_add (sce_int_t *a, sce_int_t *b)
+{
+  sce_int_t r;
+
+  /* fix precision */
+  if (a->prec < b->prec)
+    _sce_math_int_reset_prec (a, b->prec);
+  else
+    _sce_math_int_reset_prec (b, a->prec);
+
+  int carry = 0;
+  char *aa = a->val + a->prec - 1;
+  char *bb = b->val + b->prec - 1;
+
+  r = _sce_math_int_new ("0", a->prec);
+  char *rr = r.val + r.prec - 1;
+
+  while (aa != a->val)
+    {
+      int v = (*aa-- - '0') + (*bb-- - '0') + carry;
+      carry = v / 10;
+      *rr-- = (char)(v % 10) + '0';
+    }
+
+  /* last bit */
+  int v = *aa + *bb - '0' - '0' + carry;
+  carry = v / 10;
+  *rr = (char)(v % 10) + '0';
+
+  if (carry)
+    {
+      /* raise precision */
+      _sce_math_int_reset_prec (&r, r.prec + 1);
+      r.val[0] = carry + '0';
+    }
+
+  return r;
+}
+
+SCE_MATH_API int
+_sce_math_int_isgreater (sce_int_t *a, sce_int_t *b)
+{
+  char *aa = a->val;
+  char *bb = b->val;
+
+  while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
+    ;
+
+  return *aa > *bb;
+}
+
+SCE_MATH_API int
+_sce_math_int_isless (sce_int_t *a, sce_int_t *b)
+{
+  char *aa = a->val;
+  char *bb = b->val;
+
+  while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
+    ;
+
+  return *aa < *bb;
+}
+
+SCE_MATH_API int
+_sce_math_int_iseq (sce_int_t *a, sce_int_t *b)
+{
+  char *aa = a->val;
+  char *bb = b->val;
+
+  while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
+    ;
+
+  return *aa == '\0';
+}
+
+SCE_MATH_API sce_int_t
+_sce_math_int_sub (sce_int_t *a, sce_int_t *b)
 {
   sce_int_t r;
 

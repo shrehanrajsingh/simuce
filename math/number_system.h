@@ -6,6 +6,7 @@
 
 struct sce_int_s
 {
+  int is_neg;
   char *val;
   size_t prec;
 };
@@ -19,6 +20,10 @@ extern "C"
 
   SCE_MATH_API sce_int_t _sce_math_int_new (const char *, size_t);
   SCE_MATH_API sce_int_t _sce_math_int_add (sce_int_t *, sce_int_t *);
+  SCE_MATH_API sce_int_t _sce_math_int_sub (sce_int_t *, sce_int_t *);
+  SCE_MATH_API int _sce_math_int_isgreater (sce_int_t *, sce_int_t *);
+  SCE_MATH_API int _sce_math_int_isless (sce_int_t *, sce_int_t *);
+  SCE_MATH_API int _sce_math_int_iseq (sce_int_t *, sce_int_t *);
   SCE_MATH_API void _sce_math_int_reset_prec (sce_int_t *, size_t);
 
 #if !defined(SCE_MATH_INT_DEFAULT_PREC)
@@ -36,6 +41,18 @@ extern "C"
 #if !defined(ADD)
 #define ADD(X, Y) _sce_math_int_add ((X), (Y))
 #endif // ADD
+
+#if !defined(ISGR)
+#define ISGR(X, Y) _sce_math_int_isgreater ((X), (Y))
+#endif // ISGR
+
+#if !defined(ISLE)
+#define ISLE(X, Y) _sce_math_int_isless ((X), (Y))
+#endif // ISLE
+
+#if !defined(ISEQ)
+#define ISEQ(X, Y) _sce_math_int_iseq ((X), (Y))
+#endif // ISEQ
 
 #if defined(__cplusplus)
 }
