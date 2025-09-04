@@ -19,6 +19,23 @@ extern "C"
 
   SCE_MATH_API sce_int_t _sce_math_int_new (const char *, size_t);
   SCE_MATH_API sce_int_t _sce_math_int_add (sce_int_t *, sce_int_t *);
+  SCE_MATH_API void _sce_math_int_reset_prec (sce_int_t *, size_t);
+
+#if !defined(SCE_MATH_INT_DEFAULT_PREC)
+#define SCE_MATH_INT_DEFAULT_PREC 128
+#endif // SCE_MATH_INT_DEFAULT_PREC
+
+#if !defined(NUM)
+#define NUM(X) _sce_math_int_new ((X), SCE_MATH_INT_DEFAULT_PREC)
+#endif // NUM
+
+#if !defined(NUM2)
+#define NUM2(X, Y) _sce_math_int_new ((X), (Y))
+#endif // NUM
+
+#if !defined(ADD)
+#define ADD(X, Y) _sce_math_int_add ((X), (Y))
+#endif // ADD
 
 #if defined(__cplusplus)
 }

@@ -7,10 +7,13 @@ main (int argc, char const *argv[])
   ctx->head = NULL;
 
   SCE_mem_init (ctx);
-  sce_int_t n = _sce_math_int_new ("123456789", 64);
+  sce_int_t n = NUM2 ("99", 2);
+  sce_int_t m = NUM2 ("1", 2);
 
   printf ("%s\n", n.val);
-
+  printf ("%s\n", m.val);
+  printf ("%s\n", ADD (&n, &m).val);
   SCE_mem_destroy ();
-  return 0;
+
+  return printf ("Program Ended\n");
 }
