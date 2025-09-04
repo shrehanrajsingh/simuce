@@ -14,7 +14,7 @@ CALL PUT, A, B, C
 SUB C, A, B             ; C = A - B
 CALL PUT, A, B, C
 
-ROUTINE e_taylor (x)
+BEGIN ROUTINE e_taylor (x)
     ; e^x = 1 + x + 0.5x^2 + x^3/6 + ...
     LET E, x
     LET F, 1
