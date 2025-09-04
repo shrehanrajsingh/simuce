@@ -1,5 +1,5 @@
-LET A, (BIGINT) 2103382901203001302092029249
-LET B, (BIGINT) 2012932039203949332932101139
+LET A, 2103382901203001302092029249
+LET B, 2012932039203949332932101139
 
 LET C
 ADD C, A, B             ; C = A + B
@@ -13,3 +13,18 @@ CALL PUT, A, B, C
 
 SUB C, A, B             ; C = A - B
 CALL PUT, A, B, C
+
+ROUTINE e_taylor (x)
+    ; e^x = 1 + x + 0.5x^2 + x^3/6 + ...
+    LET E, x
+    LET F, 1
+    LET T, 1
+
+    REPEAT 100000
+        ADD T, T, E / F         ; t += e / f
+        MUL E, E, x             ; e = e * x
+        MUL F, F, F + 1         ; f = f * (f + 1)
+    END
+
+    RETURN T
+END
