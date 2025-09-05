@@ -7,6 +7,7 @@ add_subdirectory(tests)
 
 add_library(simuce-base
     header.h
+    debug.h debug.c
     fileio.h fileio.c
     memory.h memory.c
     simuce-base.h simuce-base.c)

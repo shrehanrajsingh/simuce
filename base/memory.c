@@ -192,3 +192,15 @@ _SCE_get_context ()
 {
   return context;
 }
+
+SCE_BASE_API char *
+SCE_Strdup (sce_mem_ctx *ctx, const char *s)
+{
+  CONTEXT_INIT (ctx);
+
+  size_t sl = strlen (s);
+  char *n = SCE_MALLOC (sl + 1);
+  memcpy (n, s, sl + 1);
+
+  return n;
+}

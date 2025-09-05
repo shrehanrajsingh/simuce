@@ -1,8 +1,16 @@
 #include "token.h"
 
-SCE_SWAN_API void
+SCE_SWAN_API sce_token_t
 sce_swan_tokenize ()
 {
+  sce_token_t t;
+
+  if (!peek ())
+    {
+      t.type = TOK_EOF;
+      return t;
+    }
+
   const size_t size_token = 256;
   size_t size_number = 1024;
 
@@ -41,13 +49,29 @@ sce_swan_tokenize ()
           if (ptr_tok != token)
             {
               if (sce_swan_isvalidtoken (token))
-                printf ("found token '%s'\n", token);
+                {
+                  D (printf ("found token '%s'\n", token));
+
+                  t.type = TOK_TOKEN;
+                  t.idt_name = SCE_STRDUP ((const char *)token);
+                }
               else
-                printf ("found identifier '%s'\n", token);
+                {
+                  D (printf ("found identifier '%s'\n", token));
+
+                  t.type = TOK_IDENTIFIER;
+                  t.idt_name = SCE_STRDUP ((const char *)token);
+                }
+
+              return t;
             }
           else if (ptr_number != number)
             {
-              printf ("found number '%s'\n", number);
+              D (printf ("found number '%s'\n", number));
+
+              t.type = TOK_NUMBER;
+              t.number = SCE_STRDUP (number);
+              return t;
             }
 
           ptr_tok = token;
@@ -60,6 +84,7 @@ sce_swan_tokenize ()
     goto _l_check;
 
   SCE_FREE (number);
+  return t;
 }
 
 SCE_SWAN_API int

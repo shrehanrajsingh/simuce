@@ -33,6 +33,8 @@ extern "C"
   SCE_BASE_API void *SCE_Realloc (sce_mem_ctx *, void *, size_t);
   SCE_BASE_API void SCE_Free (sce_mem_ctx *, void *);
 
+  SCE_BASE_API char *SCE_Strdup (sce_mem_ctx *, const char *);
+
   SCE_BASE_API sce_mem_ctx *_SCE_get_context ();
 
 #if !defined(SCE_MALLOC)
@@ -46,6 +48,10 @@ extern "C"
 #if !defined(SCE_FREE)
 #define SCE_FREE(X) SCE_Free (NULL, (X))
 #endif // SCE_FREE
+
+#if !defined(SCE_STRDUP)
+#define SCE_STRDUP(X) SCE_Strdup (NULL, (X))
+#endif // SCE_STRDUP
 
 #if defined(__cplusplus)
 }

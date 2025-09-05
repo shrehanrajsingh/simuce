@@ -15,10 +15,14 @@
 #define TOKEN_REPEAT "REPEAT"
 #define TOKEN_RETURN "RETURN"
 
-#define TOK_TOKEN 1
-#define TOK_IDENTIFIER 2
-#define TOK_NUMBER 3
-#define TOK_OPERATOR 4
+enum
+{
+  TOK_TOKEN = 1,
+  TOK_IDENTIFIER = 2,
+  TOK_NUMBER = 3,
+  TOK_OPERATOR = 4,
+  TOK_EOF
+};
 
 struct sce_token_s
 {
@@ -33,12 +37,14 @@ struct sce_token_s
   };
 };
 
+typedef struct sce_token_s sce_token_t;
+
 #if defined(__cplusplus)
 extern "C"
 {
 #endif // __cplusplus
 
-  SCE_SWAN_API void sce_swan_tokenize ();
+  SCE_SWAN_API sce_token_t sce_swan_tokenize ();
   SCE_SWAN_API int sce_swan_isvalidtoken (char *);
 
 #if defined(__cplusplus)

@@ -1,6 +1,7 @@
 #if !defined(SIMUCE_BASE_H)
 #define SIMUCE_BASE_H
 
+#include "debug.h"
 #include "fileio.h"
 #include "header.h"
 #include "memory.h"
