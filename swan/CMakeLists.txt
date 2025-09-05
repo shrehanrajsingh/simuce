@@ -11,6 +11,7 @@ include_directories(../base)
 add_library(simuce-swan
     swan_header.h
     globals.h globals.c
+    treegen.h treegen.c
     token.h token.c
     swan.h swan.c)
 

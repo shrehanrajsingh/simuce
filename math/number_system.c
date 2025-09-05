@@ -67,8 +67,17 @@ _sce_math_int_isgreater (sce_int_t *a, sce_int_t *b)
   char *aa = a->val;
   char *bb = b->val;
 
-  while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
-    ;
+  while (*aa != '\0' && *aa == '0')
+    aa++;
+
+  while (*bb != '\0' && *bb == '0')
+    bb++;
+
+  int a_size = a->prec - (aa - a->val);
+  int b_size = b->prec - (bb - b->val);
+
+  if (a_size != b_size)
+    return a_size > b_size;
 
   return *aa > *bb;
 }
@@ -79,8 +88,17 @@ _sce_math_int_isless (sce_int_t *a, sce_int_t *b)
   char *aa = a->val;
   char *bb = b->val;
 
-  while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
-    ;
+  while (*aa != '\0' && *aa == '0')
+    aa++;
+
+  while (*bb != '\0' && *bb == '0')
+    bb++;
+
+  int a_size = a->prec - (aa - a->val);
+  int b_size = b->prec - (bb - b->val);
+
+  if (a_size != b_size)
+    return a_size < b_size;
 
   return *aa < *bb;
 }
@@ -94,7 +112,7 @@ _sce_math_int_iseq (sce_int_t *a, sce_int_t *b)
   while (*aa != '\0' && *bb != '\0' && *aa++ == *bb++)
     ;
 
-  return *aa == '\0';
+  return *aa == '\0' && *bb == '\0';
 }
 
 SCE_MATH_API sce_int_t
@@ -164,4 +182,212 @@ _sce_math_int_reset_prec (sce_int_t *a, size_t n)
   memmove (a->val + n - old, a->val, old);
   memset (a->val, '0', n - old);
   a->val[a->prec] = '\0';
+}
+
+/* SCE_BASE_API sce_int_t
+_sce_math_int_mul (sce_int_t *a, sce_int_t *b)
+{
+  const size_t KARATSUBA_THRESHOLD = 40;
+
+  int result_sign = (a->is_neg != b->is_neg) ? 1 : 0;
+
+  size_t result_prec = a->prec + b->prec;
+  sce_int_t result = _sce_math_int_new ("0", result_prec);
+  result.is_neg = result_sign;
+
+  if (a->prec < KARATSUBA_THRESHOLD || b->prec < KARATSUBA_THRESHOLD)
+    {
+      for (size_t i = 0; i < result_prec; i++)
+        {
+          result.val[i] = '0';
+        }
+      result.val[result_prec] = '\0';
+
+      for (size_t i = 0; i < b->prec; i++)
+        {
+          int b_digit = b->val[b->prec - 1 - i] - '0';
+          int carry = 0;
+
+          for (size_t j = 0; j < a->prec; j++)
+            {
+              int a_digit = a->val[a->prec - 1 - j] - '0';
+              int pos = result_prec - 1 - (i + j);
+
+              int sum = (result.val[pos] - '0') + b_digit * a_digit + carry;
+              result.val[pos] = (sum % 10) + '0';
+              carry = sum / 10;
+            }
+
+          size_t pos = result_prec - 1 - (i + a->prec);
+          while (carry > 0 && pos < result_prec)
+            {
+              int sum = (result.val[pos] - '0') + carry;
+              result.val[pos] = (sum % 10) + '0';
+              carry = sum / 10;
+              pos--;
+            }
+        }
+    }
+  else
+    {
+      size_t max_prec = (a->prec > b->prec) ? a->prec : b->prec;
+      if (max_prec % 2 != 0)
+        max_prec++;
+
+      sce_int_t a_copy = _sce_math_int_new ("0", max_prec);
+      sce_int_t b_copy = _sce_math_int_new ("0", max_prec);
+
+      memcpy (a_copy.val + max_prec - a->prec, a->val, a->prec);
+      memcpy (b_copy.val + max_prec - b->prec, b->val, b->prec);
+
+      size_t m = max_prec / 2;
+
+      sce_int_t a_low = _sce_math_int_new ("0", m);
+      sce_int_t a_high = _sce_math_int_new ("0", m);
+      sce_int_t b_low = _sce_math_int_new ("0", m);
+      sce_int_t b_high = _sce_math_int_new ("0", m);
+
+      memcpy (a_low.val, a_copy.val + m, m);
+      memcpy (a_high.val, a_copy.val, m);
+      memcpy (b_low.val, b_copy.val + m, m);
+      memcpy (b_high.val, b_copy.val, m);
+
+      SCE_FREE (a_copy.val);
+      SCE_FREE (b_copy.val);
+
+      sce_int_t z0 = _sce_math_int_mul (&a_low, &b_low);
+
+      sce_int_t z2 = _sce_math_int_mul (&a_high, &b_high);
+
+      sce_int_t a_sum = _sce_math_int_add (&a_low, &a_high);
+      sce_int_t b_sum = _sce_math_int_add (&b_low, &b_high);
+
+      SCE_FREE (a_low.val);
+      SCE_FREE (a_high.val);
+      SCE_FREE (b_low.val);
+      SCE_FREE (b_high.val);
+
+      sce_int_t z1_full = _sce_math_int_mul (&a_sum, &b_sum);
+
+      SCE_FREE (a_sum.val);
+      SCE_FREE (b_sum.val);
+
+      sce_int_t temp = _sce_math_int_sub (&z1_full, &z0);
+      sce_int_t z1 = _sce_math_int_sub (&temp, &z2);
+
+      SCE_FREE (z1_full.val);
+      SCE_FREE (temp.val);
+
+      for (size_t i = 0; i < z0.prec; i++)
+        {
+          result.val[result_prec - 1 - i] = z0.val[z0.prec - 1 - i];
+        }
+
+      for (size_t i = 0; i < z1.prec; i++)
+        {
+          int pos = result_prec - 1 - m - i;
+          if (pos >= 0 && pos < result_prec)
+            {
+              int sum
+                  = (result.val[pos] - '0') + (z1.val[z1.prec - 1 - i] - '0');
+              int carry = sum / 10;
+              result.val[pos] = (sum % 10) + '0';
+
+              int carry_pos = pos - 1;
+              while (carry > 0 && carry_pos >= 0)
+                {
+                  sum = (result.val[carry_pos] - '0') + carry;
+                  result.val[carry_pos] = (sum % 10) + '0';
+                  carry = sum / 10;
+                  carry_pos--;
+                }
+            }
+        }
+
+      for (size_t i = 0; i < z2.prec; i++)
+        {
+          int pos = result_prec - 1 - 2 * m - i;
+          if (pos >= 0 && pos < result_prec)
+            {
+              int sum
+                  = (result.val[pos] - '0') + (z2.val[z2.prec - 1 - i] - '0');
+              int carry = sum / 10;
+              result.val[pos] = (sum % 10) + '0';
+
+              int carry_pos = pos - 1;
+              while (carry > 0 && carry_pos >= 0)
+                {
+                  sum = (result.val[carry_pos] - '0') + carry;
+                  result.val[carry_pos] = (sum % 10) + '0';
+                  carry = sum / 10;
+                  carry_pos--;
+                }
+            }
+        }
+
+      SCE_FREE (z0.val);
+      SCE_FREE (z1.val);
+      SCE_FREE (z2.val);
+    }
+
+  size_t leading_zeros = 0;
+  while (leading_zeros < result_prec - 1 && result.val[leading_zeros] == '0')
+    {
+      leading_zeros++;
+    }
+
+  if (leading_zeros > 0)
+    {
+      memmove (result.val, result.val + leading_zeros,
+               result_prec - leading_zeros + 1);
+      result.prec -= leading_zeros;
+    }
+
+  return result;
+} */
+
+SCE_BASE_API sce_int_t
+_sce_math_int_mul (sce_int_t *a, sce_int_t *b)
+{
+  if (ISGR (b, a))
+    {
+      sce_int_t *t = b;
+      b = a;
+      a = t;
+    }
+
+  int is_neg = (a->is_neg || b->is_neg) ? 1 : 0;
+  sce_int_t r = _sce_math_int_new ("0", a->prec + b->prec);
+
+  char *aa = a->val + a->prec - 1;
+  char *bb = b->val + b->prec - 1;
+  char *rr = r.val + r.prec - 1;
+  int shift = 0;
+
+  while (bb + 1 != b->val)
+    {
+      int bv = *bb-- - '0';
+      int carry = 0;
+
+      while (aa + 1 != a->val)
+        {
+          int av = *aa-- - '0';
+
+          int p = av * bv + carry;
+          carry = p / 10;
+          p %= 10;
+          p += *rr - '0';
+
+          carry += p / 10;
+          p %= 10;
+
+          *rr-- = p + '0';
+        }
+
+      shift++;
+      aa = a->val + a->prec - 1;
+      rr = r.val + r.prec - 1 - shift;
+    }
+
+  return r;
 }

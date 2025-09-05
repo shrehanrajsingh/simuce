@@ -2,7 +2,6 @@
 #define SCE_NUMBER_SYSTEM
 
 #include "math_header.h"
-#include <memory.h>
 
 struct sce_int_s
 {
@@ -21,6 +20,7 @@ extern "C"
   SCE_MATH_API sce_int_t _sce_math_int_new (const char *, size_t);
   SCE_MATH_API sce_int_t _sce_math_int_add (sce_int_t *, sce_int_t *);
   SCE_MATH_API sce_int_t _sce_math_int_sub (sce_int_t *, sce_int_t *);
+  SCE_BASE_API sce_int_t _sce_math_int_mul (sce_int_t *, sce_int_t *);
   SCE_MATH_API int _sce_math_int_isgreater (sce_int_t *, sce_int_t *);
   SCE_MATH_API int _sce_math_int_isless (sce_int_t *, sce_int_t *);
   SCE_MATH_API int _sce_math_int_iseq (sce_int_t *, sce_int_t *);
@@ -55,6 +55,10 @@ extern "C"
 #if !defined(SUB)
 #define SUB(X, Y) _sce_math_int_sub ((X), (Y))
 #endif // SUB
+
+#if !defined(MUL)
+#define MUL(X, Y) _sce_math_int_mul ((X), (Y))
+#endif // MUL
 
 #if !defined(ISGR)
 #define ISGR(X, Y) _sce_math_int_isgreater ((X), (Y))
